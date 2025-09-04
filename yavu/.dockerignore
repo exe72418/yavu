@@ -1,8 +1,12 @@
+# Ignorar el historial de Git
 .git
+
+# Ignorar el caché de Yarn
 .yarn/cache
 .yarn/install-state.gz
+
+# Ignorar las dependencias locales (¡muy importante!)
 node_modules
-packages/*/src
-packages/*/node_modules
-plugins
+
+# Ignorar archivos de configuración locales que no deben ir en la imagen
 *.local.yaml
