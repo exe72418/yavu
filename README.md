@@ -94,18 +94,32 @@ Una vez que todo esté corriendo, puedes acceder a tus herramientas desde el nav
 
 ## 🧪 Usando Cypress
 
-El contenedor de Cypress está diseñado para ejecutar pruebas bajo demanda.
+El contenedor de Cypress está diseñado para ejecutar pruebas de dos maneras:
 
-1.  Coloca tus archivos de prueba en la carpeta `cypress/`.
-2.  Ejecuta los tests desde la terminal en la carpeta `Servidores/`:
+### 1. Modo Headless (Recomendado para Automatización)
 
-    ```bash
-    # Para abrir la interfaz gráfica de Cypress
-    sudo docker-compose exec cypress npx cypress open
+Este modo ejecuta las pruebas en segundo plano sin abrir una interfaz gráfica. Es la forma ideal para la integración continua (CI/CD) y la que usarías en un pipeline de Jenkins. Los resultados se muestran directamente en la terminal.
 
-    # Para ejecutar las pruebas en modo terminal (headless)
-    sudo docker-compose exec cypress npx cypress run
-    ```
+```bash
+sudo docker-compose exec cypress npx cypress run
+```
+
+### 2. Modo Interactivo / Gráfico (Para Desarrollo Local)
+
+Este modo abre la interfaz de Cypress, permitiéndote ver los navegadores, seleccionar pruebas y depurar visualmente.
+
+**Requisito previo (Solo para Linux):**
+Para que la ventana del contenedor se muestre en tu escritorio, primero debes darle permiso con este comando en tu terminal (en la PC, no dentro de Docker):
+
+```bash
+xhost +local:docker
+```
+
+Una vez otorgado el permiso, puedes ejecutar el siguiente comando para abrir la interfaz:
+```bash
+sudo docker-compose exec cypress npx cypress open
+```
+**Nota:** Para otros sistemas operativos como macOS o Windows, se requieren configuraciones adicionales (como instalar XQuartz o VcXsrv).
 
 ---
 
