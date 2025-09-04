@@ -19,18 +19,22 @@ WORKDIR /app
 RUN corepack enable
 RUN addgroup --system nonroot && adduser --system --ingroup nonroot nonroot
 
-# --- CORRECCIÓN DE PERMISOS AQUÍ ---
-# Nos aseguramos de que 'nonroot' sea el dueño de TODOS los archivos copiados.
-COPY --from=builder --chown=nonroot:nonroot /app/yarn.lock /app/package.json ./
-COPY --from=builder --chown=nonroot:nonroot /app/packages packages
-COPY --from=builder --chown=nonroot:nonroot /app/plugins plugins
-COPY --from=builder --chown=nonroot:nonroot /app/app-config*.yaml ./
+# Copiamos todos los archivos necesarios (su dueño inicial será root)
+COPY --from=builder /app/yarn.lock /app/package.json ./
+COPY --from=builder /app/packages packages
+COPY --from=builder /app/plugins plugins
+COPY --from=builder /app/app-config*.yaml ./
 
 RUN yarn workspaces focus --all --production
 
-COPY --from=builder --chown=nonroot:nonroot /app/packages/backend/dist ./packages/backend/dist
-COPY --from=builder --chown=nonroot:nonroot /app/packages/app/dist ./packages/app/dist
+COPY --from=builder /app/packages/backend/dist ./packages/backend/dist
+COPY --from=builder /app/packages/app/dist ./packages/app/dist
 
+# --- EL CAMBIO MÁGICO Y DEFINITIVO ---
+# Cambiamos el dueño de TODA la carpeta /app y su contenido a 'nonroot'.
+RUN chown -R nonroot:nonroot /app
+
+# Ahora que 'nonroot' es dueño de todo, cambiamos de usuario.
 USER nonroot
 
 EXPOSE 7007
