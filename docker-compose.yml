@@ -1,4 +1,3 @@
-version: '3.8'
 
 services:
   # Servicio de Jenkins para integración continua
@@ -57,7 +56,37 @@ services:
       - servidores-net
 
   # === Servicios para Backstage ===
-  
+    # Servicio para el backend de Backstage
+  backstage-backend:
+    build:
+      context: /usr2/home/exequiel/Servidores/yavu/yavu/ # Este es el directorio raíz del proyecto Backstage
+      dockerfile: ./packages/backend/Dockerfile # Esta es la ruta al Dockerfile desde el contexto
+    image: backstage-backend:latest
+    container_name: backstage_backend
+    environment:
+      - APP_CONFIG_app_config_production_yaml_backend_database_client=pg
+      - APP_CONFIG_app_config_production_yaml_backend_database_connection_host=backstage_db
+      - APP_CONFIG_app_config_production_yaml_backend_database_connection_user=backstage
+      - APP_CONFIG_app_config_production_yaml_backend_database_connection_password=backstage
+      - APP_CONFIG_app_config_production_yaml_backend_database_connection_database=backstage
+    ports:
+      - "7007:7007"
+    depends_on:
+      - backstage_db
+    networks:
+      - servidores-net
+      
+      # Servicio para el frontend de Backstage
+  backstage-frontend:
+    image: nginx:1.25.3-alpine
+    container_name: backstage_frontend
+    ports:
+      - "7008:80"
+    volumes:
+      # Asume que 'dist' está en el directorio 'packages/app' dentro de tu proyecto Backstage
+      - /usr2/home/exequiel/Servidores/yavu/yavu/packages/app/dist:/usr/share/nginx/html:ro
+    networks:
+      - servidores-net
   # Base de datos para la aplicación Backstage
   backstage_db:
     image: postgres:13
@@ -66,26 +95,10 @@ services:
       - POSTGRES_USER=backstage
       - POSTGRES_PASSWORD=backstage
       - POSTGRES_DB=backstage
-    volumes:
-      - backstage_postgres_data:/var/lib/postgresql/data
+    #volumes:
+    #  - backstage_postgres_data:/var/lib/postgresql/data
     networks:
       - servidores-net
-
-  # Servicio de la aplicación Backstage
-  backstage:
-    build:
-      context: ./yavu
-      dockerfile: packages/backend/Dockerfile
-    container_name: backstage
-    ports:
-      - "7007:7007" # Puerto estándar de Backstage
-    volumes:
-      - ./yavu:/app # Sincroniza el código local con el contenedor
-    depends_on:
-      - backstage_db
-    networks:
-      - servidores-net
-    command: ["yarn", "start"]
 
 # Definición de los volúmenes para persistir datos
 volumes:
