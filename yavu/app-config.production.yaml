@@ -1,56 +1,36 @@
-app:
-  # Should be the same as backend.baseUrl when using the `app-backend` plugin.
-  baseUrl: http://localhost:7007
-
-#backend:
-  # Note that the baseUrl should be the URL that the browser and other clients
-  # should use when communicating with the backend, i.e. it needs to be
-  # reachable not just from within the backend host, but from all of your
-  # callers. When its value is "http://localhost:7007", it's strictly private
-  # and can't be reached by others.
-#  baseUrl: http://localhost:7007
-  # The listener can also be expressed as a single <host>:<port> string. In this case we bind to
-  # all interfaces, the most permissive setting. The right value depends on your specific deployment.
-#  listen: ':7007'
-
-  # config options: https://node-postgres.com/apis/client
-#  database:
-#    client: pg
-#    connection:
-#      host: ${POSTGRES_HOST}
-#      port: ${POSTGRES_PORT}
-#      user: ${POSTGRES_USER}
-#      password: ${POSTGRES_PASSWORD}
-      # https://node-postgres.com/features/ssl
-      # you can set the sslmode configuration option via the `PGSSLMODE` environment variable
-      # see https://www.postgresql.org/docs/current/libpq-ssl.html Table 33.1. SSL Mode Descriptions (e.g. require)
-      # ssl:
-      #   ca: # if you have a CA file and want to verify it you can uncomment this section
-      #     $file: <file-path>/ca/server.crt
+# app-config.production.yaml
+...
 backend:
-  # ... (otras configuraciones de backend)
+  baseUrl: http://localhost:7007
+  listen:
+    port: 7007
+  auth:
+    keys:
+      # This is the secret key that will be shared between the frontend and the backend.
+      # It can be any string you want, but must be the same in both files.
+      - secret: my-development-secret-key-12345
+  
+  # Database configuration should point to the correct database service
   database:
     client: pg
     connection:
-      host: db      # Clave apunta al servicio 'db' de Docker Compose
+      host: backstage_db
       port: 5432
-      user: sonar   # Usaremos el mismo usuario que SonarQube
-      password: sonar # La misma contraseña
+      user: backstage
+      password: backstage
       database: backstage
-
+      
 auth:
   providers:
     guest: {}
 
 catalog:
-  # Overrides the default list locations from app-config.yaml as these contain example data.
-  # See https://backstage.io/docs/features/software-catalog/#adding-components-to-the-catalog for more details
-  # on how to get entities into the catalog.
   locations:
-    # Local example data, replace this with your production config, these are intended for demo use only.
-    # File locations are relative to the backend process, typically in a deployed context, such as in a Docker container, this will be the root
+    # Local example data, replace this with your production config
     - type: file
       target: ./examples/entities.yaml
+      rules:
+        - allow: [Component, API, Template, Location, System, Group, User, Domain]
 
     # Local example template
     - type: file
@@ -63,3 +43,4 @@ catalog:
       target: ./examples/org.yaml
       rules:
         - allow: [User, Group]
+...

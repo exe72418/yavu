@@ -1,3 +1,4 @@
+version: '3.8' # Add or correct the version key here
 
 services:
   # Servicio de Jenkins para integración continua
@@ -69,6 +70,7 @@ services:
       - APP_CONFIG_app_config_production_yaml_backend_database_connection_user=backstage
       - APP_CONFIG_app_config_production_yaml_backend_database_connection_password=backstage
       - APP_CONFIG_app_config_production_yaml_backend_database_connection_database=backstage
+      - APP_CONFIG_app_config_production_yaml_backend_auth_keys_0_secret=my-development-secret-key-12345
     ports:
       - "7007:7007"
     depends_on:
@@ -95,8 +97,8 @@ services:
       - POSTGRES_USER=backstage
       - POSTGRES_PASSWORD=backstage
       - POSTGRES_DB=backstage
-    #volumes:
-    #  - backstage_postgres_data:/var/lib/postgresql/data
+    volumes:
+      - backstage_postgres_data:/var/lib/postgresql/data
     networks:
       - servidores-net
 

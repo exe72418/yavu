@@ -27,6 +27,7 @@ COPY --from=builder /app/packages/backend/dist/bundle.tar.gz ./bundle.tar.gz
 COPY --from=builder /app/app-config.yaml ./app-config.yaml
 COPY --from=builder /app/app-config.production.yaml ./app-config.production.yaml
 COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/examples ./examples
 
 # Descomprimimos el bundle en la raíz de la aplicación
 RUN tar xzf bundle.tar.gz && rm bundle.tar.gz
