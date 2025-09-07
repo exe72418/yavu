@@ -1,4 +1,4 @@
-version: '3.8' # Add or correct the version key here
+version: '3.8'
 
 services:
   # Servicio de Jenkins para integración continua
@@ -6,8 +6,8 @@ services:
     image: jenkins/jenkins:lts-jdk17
     container_name: jenkins
     ports:
-      - "8081:8080" # Interfaz web de Jenkins
-      - "50000:50000" # Comunicación con los agentes de construcción
+      - "8081:8080"
+      - "50000:50000"
     volumes:
       - jenkins_home:/var/jenkins_home
     networks:
@@ -25,7 +25,7 @@ services:
       - SONAR_JDBC_PASSWORD=sonar
     volumes:
       - sonarqube_data:/opt/sonarqube/data
-      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_extensions:/opt/sonqube/extensions
       - sonarqube_logs:/opt/sonarqube/logs
     depends_on:
       - db
@@ -50,46 +50,45 @@ services:
     image: cypress/included:13.13.1
     container_name: cypress
     volumes:
-      - ./cypress:/e2e # Mapea la carpeta local 'cypress' al contenedor
+      - ./cypress:/e2e
     working_dir: /e2e
     entrypoint: tail -f /dev/null
     networks:
       - servidores-net
 
   # === Servicios para Backstage ===
-    # Servicio para el backend de Backstage
   backstage-backend:
     build:
-      context: /usr2/home/exequiel/Servidores/yavu/yavu/ # Este es el directorio raíz del proyecto Backstage
-      dockerfile: ./packages/backend/Dockerfile # Esta es la ruta al Dockerfile desde el contexto
-    image: backstage-backend:latest
+      context: ./yavu
+      dockerfile: Dockerfile
     container_name: backstage_backend
     environment:
-      - APP_CONFIG_app_config_production_yaml_backend_database_client=pg
-      - APP_CONFIG_app_config_production_yaml_backend_database_connection_host=backstage_db
-      - APP_CONFIG_app_config_production_yaml_backend_database_connection_user=backstage
-      - APP_CONFIG_app_config_production_yaml_backend_database_connection_password=backstage
-      - APP_CONFIG_app_config_production_yaml_backend_database_connection_database=backstage
-      - APP_CONFIG_app_config_production_yaml_backend_auth_keys_0_secret=my-development-secret-key-12345
+      - NODE_ENV=development
+      - POSTGRES_HOST=backstage_db
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=backstage
+      - POSTGRES_PASSWORD=backstage
+      - POSTGRES_DATABASE=backstage
+      - AUTH_GITHUB_CLIENT_ID=${AUTH_GITHUB_CLIENT_ID}
+      - AUTH_GITHUB_CLIENT_SECRET=${AUTH_GITHUB_CLIENT_SECRET}
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
     ports:
       - "7007:7007"
     depends_on:
       - backstage_db
     networks:
       - servidores-net
-      
-      # Servicio para el frontend de Backstage
+
   backstage-frontend:
     image: nginx:1.25.3-alpine
     container_name: backstage_frontend
     ports:
       - "7008:80"
     volumes:
-      # Asume que 'dist' está en el directorio 'packages/app' dentro de tu proyecto Backstage
-      - /usr2/home/exequiel/Servidores/yavu/yavu/packages/app/dist:/usr/share/nginx/html:ro
+      - ./yavu/packages/app/dist:/usr/share/nginx/html:ro
     networks:
       - servidores-net
-  # Base de datos para la aplicación Backstage
+
   backstage_db:
     image: postgres:13
     container_name: backstage_db
@@ -102,7 +101,6 @@ services:
     networks:
       - servidores-net
 
-# Definición de los volúmenes para persistir datos
 volumes:
   jenkins_home:
   sonarqube_data:
@@ -111,7 +109,6 @@ volumes:
   postgres_data:
   backstage_postgres_data: {}
 
-# Definición de la red para que los contenedores se comuniquen
 networks:
   servidores-net:
     driver: bridge

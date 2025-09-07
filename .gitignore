@@ -20,3 +20,6 @@ yavu/packages/backend/dist/Dockerfile
 
 # Ignorar carpeta de build de la app de Backstage
 yavu/packages/app/dist
+
+# Ignorar archivo de variables de entorno con secretos
+.env

@@ -1,46 +1,30 @@
-# app-config.production.yaml
-...
+app:
+  baseUrl: http://localhost:7008
+
 backend:
-  baseUrl: http://localhost:7007
-  listen:
-    port: 7007
-  auth:
-    keys:
-      # This is the secret key that will be shared between the frontend and the backend.
-      # It can be any string you want, but must be the same in both files.
-      - secret: my-development-secret-key-12345
-  
-  # Database configuration should point to the correct database service
+  cors:
+    origin: http://localhost:7008
+    methods: [GET, HEAD, PATCH, POST, PUT, DELETE]
+    credentials: true
   database:
     client: pg
     connection:
-      host: backstage_db
-      port: 5432
-      user: backstage
-      password: backstage
-      database: backstage
-      
+      host: ${POSTGRES_HOST} # Lee la variable de compose
+      port: ${POSTGRES_PORT}
+      user: ${POSTGRES_USER}
+      password: ${POSTGRES_PASSWORD}
+      database: ${POSTGRES_DATABASE}
+
 auth:
   providers:
-    guest: {}
+    github:
+      production:
+        clientId: ${AUTH_GITHUB_CLIENT_ID} # Lee la variable de compose
+        clientSecret: ${AUTH_GITHUB_CLIENT_SECRET} # Lee la variable de compose
 
-catalog:
-  locations:
-    # Local example data, replace this with your production config
-    - type: file
-      target: ./examples/entities.yaml
-      rules:
-        - allow: [Component, API, Template, Location, System, Group, User, Domain]
-
-    # Local example template
-    - type: file
-      target: ./examples/template/template.yaml
-      rules:
-        - allow: [Template]
-
-    # Local example organizational data
-    - type: file
-      target: ./examples/org.yaml
-      rules:
-        - allow: [User, Group]
-...
+techdocs:
+  builder: 'local'
+  generator:
+    runIn: 'docker'
+  publisher:
+    type: 'local'
