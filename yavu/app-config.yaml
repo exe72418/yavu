@@ -69,15 +69,26 @@ catalog:
   locations:
     # Carga los usuarios y grupos para el login (el archivo que creaste)
     - type: file
-      target: ../../examples/org.yaml
+      target: /app/examples/org.yaml
       rules:
         - allow: [User, Group]
     
-    # Datos de ejemplo de Backstage
+    # Carga los datos de ejemplo de Backstage.
     - type: file
-      target: ../../examples/entities.yaml
+      target: /app/examples/entities.yaml
 
+    # Carga la plantilla del reporte.
     - type: file
-      target: ../../examples/template/template.yaml
+      target: /app/examples/template/template.yaml
       rules:
         - allow: [Template]
+        
+    - type: file
+      target: /app/templates-backstage/template.yaml
+      rules:
+        - allow: [Template]
+  #  - type: url
+  #    target: https://github.com/projectsconsulting/backstage-templates/blob/main/template.yaml
+  #    rules:
+  #      - allow: [Template]
+        

@@ -62,6 +62,8 @@ services:
       context: ./yavu
       dockerfile: Dockerfile
     container_name: backstage_backend
+    volumes:
+      - /home/exequiel/proyectos/templates-backstage:/app/templates-backstage
     environment:
       - NODE_ENV=development
       - POSTGRES_HOST=backstage_db
